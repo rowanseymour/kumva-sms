@@ -27,13 +27,16 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.ijuru.kumva.site.Dictionary;
+import com.ijuru.kumva.remote.RemoteDictionary;
+import com.ijuru.kumva.remote.RemoteSearch;
+import com.ijuru.kumva.search.Search;
+import com.ijuru.kumva.search.SearchResult;
 
 public class SearchServlet extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
 	
-	private Dictionary dictionary = new Dictionary("http://kinyarwanda.net", "Kinyarwanda-English", null, "rw", "en");
+	private RemoteDictionary dictionary = new RemoteDictionary("http://kinyarwanda.net", "Kinyarwanda-English", null, "rw", "en");
 
 	/**
 	 * @see javax.servlet.http.HttpServlet#doGet(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
@@ -47,10 +50,15 @@ public class SearchServlet extends HttpServlet {
 		if (query == null || query.length() == 0)
 			return;
 		
-		OnlineSearch search = new OnlineSearch(dictionary, 10000);
-		SearchResult result = search.doSearch(query, 10);
-		
-		String message = Messages.format(result.getMatches());
-		out.write(message);
+		try {
+			Search search = new RemoteSearch(dictionary, 10000);
+			SearchResult result = search.execute(query, 10, "sms");
+			
+			String message = Messages.searchResult(result.getMatches());
+			out.write(message);
+		}
+		catch (Exception ex) {
+			out.write(Messages.errorOccurred());
+		}
 	}
 }

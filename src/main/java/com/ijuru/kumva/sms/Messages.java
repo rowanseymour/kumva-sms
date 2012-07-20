@@ -22,6 +22,7 @@ package com.ijuru.kumva.sms;
 import java.util.List;
 
 import com.ijuru.kumva.Entry;
+import com.ijuru.kumva.Revision;
 
 public class Messages {
 
@@ -30,7 +31,27 @@ public class Messages {
 	 * @param entries the entries
 	 * @return the SMS message body
 	 */
-	public static String format(List<Entry> entries) {
-		return "TEST";
+	public static String searchResult(List<Entry> entries) {
+		StringBuilder builder = new StringBuilder();
+		
+		for (int e = 0; e < entries.size(); ++e) {
+			Entry entry = entries.get(e);
+			Revision revision = entry.getRevisions().get(0);
+			
+			if (e > 0)
+				builder.append("|");
+			
+			builder.append(revision.getPrefix() + revision.getLemma());
+		}
+		
+		return builder.toString();
+	}
+	
+	/**
+	 * Gets the message to use if an error occurred
+	 * @return the SMS message body
+	 */
+	public static String errorOccurred() {
+		return "Sorry but an error occurred";
 	}
 }
