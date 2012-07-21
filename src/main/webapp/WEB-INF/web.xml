@@ -13,5 +13,9 @@
         <servlet-name>search</servlet-name>
         <url-pattern>/search</url-pattern>
     </servlet-mapping>
+
+	<listener>
+		<listener-class>com.ijuru.kumva.sms.Listener</listener-class>
+	</listener>
     
 </web-app>

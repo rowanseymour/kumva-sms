@@ -27,17 +27,19 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.ijuru.kumva.remote.RemoteDictionary;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
+
 import com.ijuru.kumva.remote.RemoteSearch;
 import com.ijuru.kumva.search.Search;
 import com.ijuru.kumva.search.SearchResult;
 
 public class SearchServlet extends HttpServlet {
+	
+	protected static final Logger log = LogManager.getLogger(SearchServlet.class);
 
 	private static final long serialVersionUID = 1L;
 	
-	private RemoteDictionary dictionary = new RemoteDictionary("http://kinyarwanda.net", "Kinyarwanda-English", null, "rw", "en");
-
 	/**
 	 * @see javax.servlet.http.HttpServlet#doGet(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
 	 */
@@ -49,16 +51,18 @@ public class SearchServlet extends HttpServlet {
 		
 		if (query == null || query.length() == 0)
 			return;
-		
+			
 		try {
-			Search search = new RemoteSearch(dictionary, 10000);
-			SearchResult result = search.execute(query, 10, "sms");
+			Search search = new RemoteSearch(Context.getDictionary(), Context.getTimeout());
+			SearchResult result = search.execute(query, 10, Context.getSearchRef());
 			
 			String message = Messages.searchResult(result.getMatches());
 			out.write(message);
 		}
 		catch (Exception ex) {
 			out.write(Messages.errorOccurred());
+			
+			log.warn("Remote search failed");
 		}
 	}
 }
