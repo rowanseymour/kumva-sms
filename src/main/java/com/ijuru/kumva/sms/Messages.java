@@ -26,6 +26,7 @@ import org.apache.commons.lang3.StringUtils;
 import com.ijuru.kumva.Entry;
 import com.ijuru.kumva.Meaning;
 import com.ijuru.kumva.Revision;
+import com.ijuru.kumva.search.SearchResult;
 
 /**
  * Formatting methods for SMS messages
@@ -33,29 +34,40 @@ import com.ijuru.kumva.Revision;
 public class Messages {
 
 	protected static final int MAX_CHARS = 140;
+	
 	protected static final String ENTRY_SEPARATOR = " | ";
-	protected static final String ERROR_MESSAGE = "Sorry but an error occurred";
+	protected static final String MEANING_MARKER = " - ";
+	protected static final String MEANING_SEPARATOR = ", ";
+	
 	protected static final String EMPTY_MESSAGE = "Sorry no results were found for '%s'";
+	protected static final String ERROR_MESSAGE1 = "Sorry an error has occurred";
+	protected static final String ERROR_MESSAGE2 = " - please contact %s";
 	
 	/**
 	 * Formats an SMS message from a list of revisions
 	 * @param entries the entries
 	 * @return the SMS message body
 	 */
-	public static String searchResult(List<Entry> entries) {
+	public static String searchResult(SearchResult result, String query) {
 		StringBuilder builder = new StringBuilder();
+		List<Entry> entries = result.getMatches();
 		
-		for (int e = 0; e < entries.size(); ++e) {
-			Entry entry = entries.get(e);
-			String entryStr = formatEntry(entry);
-			
-			if (e > 0)
-				builder.append(ENTRY_SEPARATOR);
-			
-			builder.append(entryStr);
-			
-			if (builder.length() >= MAX_CHARS)
-				break;
+		if (entries.size() > 0) {
+			for (int e = 0; e < entries.size(); ++e) {
+				Entry entry = entries.get(e);
+				String entryStr = formatEntry(entry);
+				
+				if (e > 0)
+					builder.append(ENTRY_SEPARATOR);
+				
+				builder.append(entryStr);
+				
+				if (builder.length() >= MAX_CHARS)
+					break;
+			}
+		}
+		else {
+			builder.append(EMPTY_MESSAGE.replace("%s", query));
 		}
 		
 		String message = builder.toString();
@@ -66,26 +78,15 @@ public class Messages {
 		return message;
 	}
 	
-	/**
-	 * Gets the message to use if an error occurred
-	 * @return the SMS message body
-	 */
 	public static String errorOccurred() {
-		return ERROR_MESSAGE;
-	}
-	
-	/**
-	 * Gets the message to use if no results were returned
-	 * @param query the query
-	 * @return the SMS message body
-	 */
-	public static String noResultsReturned(String query) {
-		String message = EMPTY_MESSAGE.replace("%s", query);
+		StringBuilder builder = new StringBuilder();
+		builder.append(ERROR_MESSAGE1);
 		
-		if (message.length() > MAX_CHARS)
-			message = StringUtils.abbreviate(message, MAX_CHARS);
-		
-		return message;
+		String supportEmail = Context.getRuntimeProperties().getProperty("support.email");
+		if (StringUtils.isNotEmpty(supportEmail))
+			builder.append(ERROR_MESSAGE2.replace("%s", supportEmail));
+			
+		return builder.toString();
 	}
 	
 	/**
@@ -93,22 +94,22 @@ public class Messages {
 	 * @param entry the entry
 	 * @return the formatted string
 	 */
-	private static String formatEntry(Entry entry) {
+	protected static String formatEntry(Entry entry) {
 		StringBuilder builder = new StringBuilder();
 		Revision revision = entry.getRevisions().get(0);
 		
-		builder.append(revision.getPrefix() + revision.getLemma());
+		if (!StringUtils.isEmpty(revision.getPrefix()))
+			builder.append(revision.getPrefix());
 		
-		if (!StringUtils.isEmpty(revision.getWordClass()))
-			builder.append("[" + revision.getWordClass() + "]");
+		builder.append(revision.getLemma());
 		
-		builder.append(" - ");
+		builder.append(MEANING_MARKER);
 		
 		for (int m = 0; m < revision.getMeanings().size(); ++m) {
 			Meaning meaning = revision.getMeanings().get(m);
 			
 			if (m > 0)
-				builder.append(", ");
+				builder.append(MEANING_SEPARATOR);
 			
 			builder.append(meaning.getText());
 		}

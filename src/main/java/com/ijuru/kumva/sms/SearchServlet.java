@@ -66,13 +66,7 @@ public class SearchServlet extends HttpServlet {
 		try {
 			Search search = new RemoteSearch(Context.getDictionary(), timeout);
 			SearchResult result = search.execute(query, 10, searchRef);
-			String message;
-			
-			// Return entries, or message if no entries we're returned
-			if (result.getMatches().size() > 0)
-				message = Messages.searchResult(result.getMatches());
-			else
-				message = Messages.noResultsReturned(query);
+			String message = Messages.searchResult(result, query);
 			
 			out.write(message);
 		}
