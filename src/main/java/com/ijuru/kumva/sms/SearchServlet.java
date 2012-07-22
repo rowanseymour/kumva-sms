@@ -21,6 +21,7 @@ package com.ijuru.kumva.sms;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Properties;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -51,12 +52,28 @@ public class SearchServlet extends HttpServlet {
 		
 		if (query == null || query.length() == 0)
 			return;
+		
+		Properties properties = Context.getRuntimeProperties();
+		int timeout = 10000;
+		String searchRef = "sms";
+		
+		// Get runtime properties
+		if (properties.containsKey("connection.timeout"))
+			timeout = Integer.parseInt(properties.getProperty("connection.timeout"));
+		if (properties.containsKey("search.ref"))
+			searchRef = properties.getProperty("search.ref");
 			
 		try {
-			Search search = new RemoteSearch(Context.getDictionary(), Context.getTimeout());
-			SearchResult result = search.execute(query, 10, Context.getSearchRef());
+			Search search = new RemoteSearch(Context.getDictionary(), timeout);
+			SearchResult result = search.execute(query, 10, searchRef);
+			String message;
 			
-			String message = Messages.searchResult(result.getMatches());
+			// Return entries, or message if no entries we're returned
+			if (result.getMatches().size() > 0)
+				message = Messages.searchResult(result.getMatches());
+			else
+				message = Messages.noResultsReturned(query);
+			
 			out.write(message);
 		}
 		catch (Exception ex) {

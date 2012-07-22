@@ -10,8 +10,19 @@
 	
 	<name>Kumva SMS proxy</name>
 	
+	<scm>
+		<connection>scm:git:git@github.com:rowanseymour/kumva-sms.git</connection>
+		<developerConnection>scm:git:git@github.com:rowanseymour/kumva-sms.git</developerConnection>
+		<url>scm:git:git@github.com:rowanseymour/kumva-sms.git</url>
+	</scm>
+
 	<dependencies>
-	    <dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>3.1</version>
+		</dependency>
+		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>servlet-api</artifactId>
 			<version>2.5</version>

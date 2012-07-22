@@ -21,11 +21,22 @@ package com.ijuru.kumva.sms;
 
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.ijuru.kumva.Entry;
+import com.ijuru.kumva.Meaning;
 import com.ijuru.kumva.Revision;
 
+/**
+ * Formatting methods for SMS messages
+ */
 public class Messages {
 
+	protected static final int MAX_CHARS = 140;
+	protected static final String ENTRY_SEPARATOR = " | ";
+	protected static final String ERROR_MESSAGE = "Sorry but an error occurred";
+	protected static final String EMPTY_MESSAGE = "Sorry no results were found for '%s'";
+	
 	/**
 	 * Formats an SMS message from a list of revisions
 	 * @param entries the entries
@@ -36,15 +47,23 @@ public class Messages {
 		
 		for (int e = 0; e < entries.size(); ++e) {
 			Entry entry = entries.get(e);
-			Revision revision = entry.getRevisions().get(0);
+			String entryStr = formatEntry(entry);
 			
 			if (e > 0)
-				builder.append("|");
+				builder.append(ENTRY_SEPARATOR);
 			
-			builder.append(revision.getPrefix() + revision.getLemma());
+			builder.append(entryStr);
+			
+			if (builder.length() >= MAX_CHARS)
+				break;
 		}
 		
-		return builder.toString();
+		String message = builder.toString();
+		
+		if (message.length() > MAX_CHARS)
+			message = StringUtils.abbreviate(message, MAX_CHARS);
+		
+		return message;
 	}
 	
 	/**
@@ -52,6 +71,48 @@ public class Messages {
 	 * @return the SMS message body
 	 */
 	public static String errorOccurred() {
-		return "Sorry but an error occurred";
+		return ERROR_MESSAGE;
+	}
+	
+	/**
+	 * Gets the message to use if no results were returned
+	 * @param query the query
+	 * @return the SMS message body
+	 */
+	public static String noResultsReturned(String query) {
+		String message = EMPTY_MESSAGE.replace("%s", query);
+		
+		if (message.length() > MAX_CHARS)
+			message = StringUtils.abbreviate(message, MAX_CHARS);
+		
+		return message;
+	}
+	
+	/**
+	 * Formats a single entry
+	 * @param entry the entry
+	 * @return the formatted string
+	 */
+	private static String formatEntry(Entry entry) {
+		StringBuilder builder = new StringBuilder();
+		Revision revision = entry.getRevisions().get(0);
+		
+		builder.append(revision.getPrefix() + revision.getLemma());
+		
+		if (!StringUtils.isEmpty(revision.getWordClass()))
+			builder.append("[" + revision.getWordClass() + "]");
+		
+		builder.append(" - ");
+		
+		for (int m = 0; m < revision.getMeanings().size(); ++m) {
+			Meaning meaning = revision.getMeanings().get(m);
+			
+			if (m > 0)
+				builder.append(", ");
+			
+			builder.append(meaning.getText());
+		}
+		
+		return builder.toString();
 	}
 }

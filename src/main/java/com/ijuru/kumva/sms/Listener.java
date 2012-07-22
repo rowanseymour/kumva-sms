@@ -56,10 +56,7 @@ public class Listener implements ServletContextListener {
 			Properties properties = new Properties();
 			properties.load(new FileReader(propsFile));
 			
-			if (properties.containsKey("connection.timeout"))
-				Context.setTimeout(Integer.parseInt(properties.getProperty("connection.timeout")));
-			if (properties.containsKey("search.ref"))
-				Context.setSearchRef(properties.getProperty("search.ref"));
+			Context.setRuntimeProperties(properties);
 			
 			String dictionaryURL = properties.getProperty("dictionary.url");
 			Context.setDictionary(new RemoteDictionary(dictionaryURL));

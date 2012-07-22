@@ -19,6 +19,8 @@
 
 package com.ijuru.kumva.sms;
 
+import java.util.Properties;
+
 import com.ijuru.kumva.remote.RemoteDictionary;
 
 /**
@@ -27,8 +29,7 @@ import com.ijuru.kumva.remote.RemoteDictionary;
 public class Context {
 
 	private static RemoteDictionary dictionary;
-	private static int timeout = 10000;
-	private static String searchRef = "sms";
+	private static Properties properties;
 
 	/**
 	 * Gets the dictionary
@@ -47,34 +48,18 @@ public class Context {
 	}
 
 	/**
-	 * Gets the timeout (milliseconds)
-	 * @return the timeout
+	 * Gets the runtime properties
+	 * @return the properties
 	 */
-	public static int getTimeout() {
-		return timeout;
+	public static Properties getRuntimeProperties() {
+		return properties;
 	}
 
 	/**
-	 * Sets the timeout (milliseconds)
-	 * @param timeout the timeout
+	 * Sets the runtime properties
+	 * @param properties the properties
 	 */
-	public static void setTimeout(int timeout) {
-		Context.timeout = timeout;
-	}
-
-	/**
-	 * Gets the search ref
-	 * @return the search ref
-	 */
-	public static String getSearchRef() {
-		return searchRef;
-	}
-
-	/**
-	 * Sets the search ref
-	 * @param searchRef the search ref
-	 */
-	public static void setSearchRef(String searchRef) {
-		Context.searchRef = searchRef;
+	public static void setRuntimeProperties(Properties properties) {
+		Context.properties = properties;
 	}
 }
