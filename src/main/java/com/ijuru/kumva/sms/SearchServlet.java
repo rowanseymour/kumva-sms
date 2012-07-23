@@ -28,6 +28,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
@@ -46,12 +47,20 @@ public class SearchServlet extends HttpServlet {
 	 */
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		PrintWriter out = response.getWriter();
-		
+		PrintWriter out = response.getWriter();		
 		String query = request.getParameter("q");
 		
 		if (query == null || query.length() == 0)
 			return;
+		
+		query = query.trim();
+		
+		String keyword = Context.getRuntimeProperties().getProperty("input.keyword");
+		
+		// Strip keyword if one is specified
+		if (StringUtils.isNotEmpty(keyword) && query.toLowerCase().startsWith(keyword + " ")) {
+			query = query.substring((keyword + " ").length());
+		}
 		
 		Properties properties = Context.getRuntimeProperties();
 		int timeout = 10000;
