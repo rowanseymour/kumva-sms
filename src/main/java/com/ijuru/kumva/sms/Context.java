@@ -19,7 +19,7 @@
 
 package com.ijuru.kumva.sms;
 
-import java.util.Properties;
+import org.codehaus.jackson.map.ObjectMapper;
 
 import com.ijuru.kumva.remote.RemoteDictionary;
 
@@ -29,7 +29,34 @@ import com.ijuru.kumva.remote.RemoteDictionary;
 public class Context {
 
 	private static RemoteDictionary dictionary;
-	private static Properties properties;
+	private static Options options;
+	
+	/**
+	 * Starts the application
+	 * @throws Exception 
+	 */
+	public static void startApplication() throws Exception {
+		// Look for environment variable 
+		String optionsJSON = System.getenv("KUMVA_OPTIONS");
+		if (optionsJSON == null)
+			throw new Exception("KUMVA_OPTIONS environment variable not defined");
+			
+		ObjectMapper mapper = new ObjectMapper();
+		options = mapper.readValue(optionsJSON, Options.class);
+		
+		if (options.getDictionaryURL() == null)
+			throw new Exception("No dictionary URL specified");
+			
+		dictionary = new RemoteDictionary(options.getDictionaryURL());
+	}
+	
+	public static void destroyApplication() {
+		
+	}
+	
+	public static Options getOptions() {
+		return options;
+	}
 
 	/**
 	 * Gets the dictionary
@@ -37,29 +64,5 @@ public class Context {
 	 */
 	public static RemoteDictionary getDictionary() {
 		return dictionary;
-	}
-
-	/**
-	 * Sets the dictionary
-	 * @param dictionary the dictionary
-	 */
-	public static void setDictionary(RemoteDictionary dictionary) {
-		Context.dictionary = dictionary;
-	}
-
-	/**
-	 * Gets the runtime properties
-	 * @return the properties
-	 */
-	public static Properties getRuntimeProperties() {
-		return properties;
-	}
-
-	/**
-	 * Sets the runtime properties
-	 * @param properties the properties
-	 */
-	public static void setRuntimeProperties(Properties properties) {
-		Context.properties = properties;
 	}
 }

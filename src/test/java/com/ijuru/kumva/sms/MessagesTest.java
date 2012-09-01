@@ -21,7 +21,6 @@ package com.ijuru.kumva.sms;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Properties;
 
 import com.ijuru.kumva.Entry;
 import com.ijuru.kumva.Meaning;
@@ -41,7 +40,7 @@ public class MessagesTest extends TestCase {
 	 */
 	@Override
 	protected void setUp() throws Exception {
-		Context.setRuntimeProperties(new Properties());
+		Context.startApplication();
 	}
 	
 	public void test_searchResult() {
@@ -84,7 +83,7 @@ public class MessagesTest extends TestCase {
 		assertEquals("Sorry an error has occurred", Messages.errorOccurred());
 		
 		// Test with support email address
-		Context.getRuntimeProperties().setProperty("support.email", "rowan@ijuru.com");
-		assertEquals("Sorry an error has occurred - please contact rowan@ijuru.com", Messages.errorOccurred());
+		Context.getOptions().setSupportEmail("test@test.com");
+		assertEquals("Sorry an error has occurred - please contact test@test.com", Messages.errorOccurred());
 	}
 }

@@ -6,7 +6,7 @@
   	
 	<servlet>
         <servlet-name>search</servlet-name>
-        <servlet-class>com.ijuru.kumva.sms.SearchServlet</servlet-class>
+        <servlet-class>com.ijuru.kumva.sms.web.SearchServlet</servlet-class>
     </servlet>
     
     <servlet-mapping>
@@ -15,7 +15,7 @@
     </servlet-mapping>
 
 	<listener>
-		<listener-class>com.ijuru.kumva.sms.Listener</listener-class>
+		<listener-class>com.ijuru.kumva.sms.web.Listener</listener-class>
 	</listener>
     
 </web-app>

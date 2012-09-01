@@ -17,11 +17,10 @@
  * along with Kumva. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.ijuru.kumva.sms;
+package com.ijuru.kumva.sms.web;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Properties;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -35,6 +34,8 @@ import org.apache.log4j.Logger;
 import com.ijuru.kumva.remote.RemoteSearch;
 import com.ijuru.kumva.search.Search;
 import com.ijuru.kumva.search.SearchResult;
+import com.ijuru.kumva.sms.Context;
+import com.ijuru.kumva.sms.Messages;
 
 public class SearchServlet extends HttpServlet {
 	
@@ -55,23 +56,16 @@ public class SearchServlet extends HttpServlet {
 		
 		query = query.trim();
 		
-		String keyword = Context.getRuntimeProperties().getProperty("input.keyword");
+		String keyword = Context.getOptions().getInputKeyword();
 		
 		// Strip keyword if one is specified
 		if (StringUtils.isNotEmpty(keyword) && query.toLowerCase().startsWith(keyword + " ")) {
 			query = query.substring((keyword + " ").length());
 		}
 		
-		Properties properties = Context.getRuntimeProperties();
-		int timeout = 10000;
-		String searchRef = "sms";
+		int timeout = Context.getOptions().getConnectionTimeout();
+		String searchRef = Context.getOptions().getSearchRef();
 		
-		// Get runtime properties
-		if (properties.containsKey("connection.timeout"))
-			timeout = Integer.parseInt(properties.getProperty("connection.timeout"));
-		if (properties.containsKey("search.ref"))
-			searchRef = properties.getProperty("search.ref");
-			
 		try {
 			Search search = new RemoteSearch(Context.getDictionary(), timeout);
 			SearchResult result = search.execute(query, 10, searchRef);

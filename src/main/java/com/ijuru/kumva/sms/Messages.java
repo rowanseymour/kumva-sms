@@ -82,7 +82,7 @@ public class Messages {
 		StringBuilder builder = new StringBuilder();
 		builder.append(ERROR_MESSAGE1);
 		
-		String supportEmail = Context.getRuntimeProperties().getProperty("support.email");
+		String supportEmail = Context.getOptions().getSupportEmail();
 		if (StringUtils.isNotEmpty(supportEmail))
 			builder.append(ERROR_MESSAGE2.replace("%s", supportEmail));
 			

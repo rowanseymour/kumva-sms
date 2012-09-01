@@ -1,1 +1,16 @@
-SMS Proxy for Kumva
+=================================
+Kumva SMS Proxy Readme
+=================================
+
+Usage
+=================================
+
+To override the default settings, define an environment variable withthe following JSON values:
+
+{
+	"dictionaryURL": "http://kinyarwanda.net",
+	"connectionTimeout": 10000,
+	"searchRef": "sms",
+	"supportEmail": "rowanseymour@gmail.com",
+	"inputKeyword": "kinya"
+}

@@ -17,12 +17,7 @@
  * along with Kumva. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.ijuru.kumva.sms;
-
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.util.Properties;
+package com.ijuru.kumva.sms.web;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
@@ -30,7 +25,7 @@ import javax.servlet.ServletContextListener;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
-import com.ijuru.kumva.remote.RemoteDictionary;
+import com.ijuru.kumva.sms.Context;
 
 /**
  * Listens for webapp stop/start
@@ -39,34 +34,17 @@ public class Listener implements ServletContextListener {
 
 	protected static final Logger log = LogManager.getLogger(Listener.class);
 	
-	private static final String PROPS_FILENAME = "kumva-sms.properties";
-	
 	/**
 	 * Web application is being deployed or started
 	 */
 	public void contextInitialized(ServletContextEvent event) {	
 		log.info("Initializing Kumva SMS proxy");
 		
-		File homeDir = Utils.homeDirectory();
-		File propsFile = new File(homeDir, PROPS_FILENAME);
-		
-		log.info("Using home directory '" + homeDir.getAbsolutePath() + "'");
-	
 		try {
-			Properties properties = new Properties();
-			properties.load(new FileReader(propsFile));
+			Context.startApplication();
 			
-			Context.setRuntimeProperties(properties);
-			
-			String dictionaryURL = properties.getProperty("dictionary.url");
-			Context.setDictionary(new RemoteDictionary(dictionaryURL));
-			
-			log.info("Loaded properties from '" + propsFile.getAbsolutePath() + "'");
-			
-		} catch (FileNotFoundException e) {
-			log.error("Properties file '" + propsFile.getAbsolutePath() + "' doesn't exist");
-		} catch (Exception e) {
-			log.error("Properties file '" + propsFile.getAbsolutePath() + "' couldn't be read");
+		} catch (Exception ex) {
+			log.error("Unable to start application", ex);
 		}
 	}
 	
@@ -76,6 +54,6 @@ public class Listener implements ServletContextListener {
 	public void contextDestroyed(ServletContextEvent event) {
 		log.info("Destroying Kumva SMS proxy");
 		
-		Context.setDictionary(null);
+		Context.destroyApplication();
 	}
 }
