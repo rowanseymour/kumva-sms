@@ -1,4 +1,3 @@
-package com.ijuru.kumva.sms;
 /**
  * Copyright 2011 Rowan Seymour
  * 
@@ -18,9 +17,15 @@ package com.ijuru.kumva.sms;
  * along with Kumva. If not, see <http://www.gnu.org/licenses/>.
  */
 
+package com.ijuru.kumva.sms;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 import com.ijuru.kumva.Entry;
 import com.ijuru.kumva.Meaning;
@@ -28,22 +33,25 @@ import com.ijuru.kumva.Revision;
 import com.ijuru.kumva.search.SearchResult;
 import com.ijuru.kumva.sms.Messages;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.*;
 
 /**
  * Test case for Messages
  */
-public class MessagesTest extends TestCase {
+public class MessagesTest {
 
-	/**
-	 * @see junit.framework.TestCase#setUp()
-	 */
-	@Override
-	protected void setUp() throws Exception {
+	@BeforeClass
+	public static void setUp() throws Exception {
 		Context.startApplication();
 	}
 	
-	public void test_searchResult() {
+	@AfterClass
+	public static void tearDown() {
+		Context.destroyApplication();
+	}
+	
+	@Test
+	public void searchResult() {
 		Revision revision1 = new Revision();
 		revision1.setWordClass("n");
 		revision1.setPrefix("iki");
@@ -78,7 +86,8 @@ public class MessagesTest extends TestCase {
 		assertEquals("Sorry no results were found for 'test'", Messages.searchResult(resultEmpty, "test"));
 	}
 
-	public void test_errorOccurred() {	
+	@Test
+	public void errorOccurred() {	
 		// Test without support email address
 		assertEquals("Sorry an error has occurred", Messages.errorOccurred());
 		
